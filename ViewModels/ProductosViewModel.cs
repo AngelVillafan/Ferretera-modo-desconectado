@@ -49,7 +49,7 @@ namespace FerreteraBD.ViewModels
             }
         }
 
-        //Lista de secciones
+        //Lista de secciones 
         private List<Seccion> listaseccion;
 
         public List<Seccion> ListaSeccion
