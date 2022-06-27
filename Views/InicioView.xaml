@@ -1,0 +1,88 @@
+﻿<Window x:Class="FerreteraBD.Views.InicioView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:FerreteraBD.Views"
+        xmlns:vm="clr-namespace:FerreteraBD.ViewModels"
+        mc:Ignorable="d"
+        Title="InicioView" Height="700" Width="1000" Background="#e5e5e5" ResizeMode="NoResize">
+    <Window.DataContext>
+        <vm:ProductosViewModel></vm:ProductosViewModel>
+    </Window.DataContext>
+    
+    <Grid>
+        <DockPanel>
+            <Border DockPanel.Dock="Top"
+                    Padding="10"
+                    Margin="15"
+                    Background="#292929">
+                <Border.Effect>
+                    <DropShadowEffect Color="Gray"
+                                      ShadowDepth="8"
+                                      Direction="270"
+                                      BlurRadius="30"></DropShadowEffect>
+                </Border.Effect>
+                <DockPanel>
+                    <Image DockPanel.Dock="Left"
+                           Source="https://seeklogo.com/images/T/truper-logo-0E66010639-seeklogo.com.png"
+                           Width="150"
+                           RenderOptions.BitmapScalingMode="Fant"></Image>
+                    
+                    <WrapPanel DockPanel.Dock="Right"
+                               VerticalAlignment="Center">
+                        <Button Command="{Binding AgregarCommand}">&#10133;</Button>
+                        <Button Command="{Binding EditarCommand}">&#x270f;</Button>
+                        <Button Command="{Binding EliminarCommand}">&#x2796;</Button>
+                    </WrapPanel>
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock Style="{StaticResource TituloTruper}">La ferreteria del centro</TextBlock>
+                        <TextBlock Style="{StaticResource SubtituloTruper}">Control de inventarios</TextBlock>
+                    </StackPanel>
+                </DockPanel>
+            </Border>
+
+            <TextBlock DockPanel.Dock="Bottom"
+                       Text="{Binding Error}"
+                       Style="{StaticResource textoError}"></TextBlock>
+            <ListView DockPanel.Dock="Left"
+                      BorderThickness="0"
+                      Padding="0"
+                      Background="Transparent"
+                      ItemsSource="{Binding ListaProductos}"
+                      SelectedItem="{Binding Producto}"
+                      Margin="15,0,15,15">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <Border Style="{StaticResource ElementoListaBorde}">
+                            <TextBlock Text="{Binding Nombre}"
+                                       Style="{StaticResource ElementoListaTexto}"></TextBlock>
+                        </Border>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+                
+            </ListView>
+            
+            
+            
+            <ContentControl Margin="0,0,15,15"
+                            Content="{Binding Vista}">
+                <ContentControl.Style>
+                    <Style TargetType="ContentControl">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Modo}" Value="Agregar">
+                                <Setter Property="Content" Value="{StaticResource Agregar}"></Setter>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </ContentControl.Style>
+                
+            </ContentControl>
+            
+        </DockPanel>
+        
+        
+        
+        
+    </Grid>
+</Window>

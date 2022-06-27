@@ -6,7 +6,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
+using System.Windows.Input;
 using FerreteraBD.Models;
+using FerreteraBD.Views;
+using GalaSoft.MvvmLight.Command;
 
 namespace FerreteraBD.ViewModels
 {
@@ -15,6 +18,12 @@ namespace FerreteraBD.ViewModels
         FerreteriaContext context = new FerreteriaContext();
 
         // PROPIEDADES
+
+        public ICommand AgregarCommand { get; set; }
+        public ICommand EditarCommand { get; set; }
+        public ICommand CancelarCommand { get; set; }
+        public ICommand EliminarCommand { get; set; }
+        public ICommand GuardarCommand { get; set; }
 
         //Propiedad para mostrar los errores
         private string error;
@@ -45,7 +54,7 @@ namespace FerreteraBD.ViewModels
         {
             get { return lista; }
             set { lista = value;
-                Actualizar("Lista");
+                Actualizar("ListaProductos");
             }
         }
 
@@ -56,22 +65,23 @@ namespace FerreteraBD.ViewModels
         {
             get { return listaseccion; }
             set { listaseccion = value; 
-                Actualizar("ListaSexxion");
+                Actualizar("ListaSeccion");
             }
         }
 
-        private ContentControl vista;
-
-        public ContentControl Vista
-        {
-            get { return vista; }
-            set { vista = value; }
-        }
+        public string Modo { get; set; } = "Ver";
+        public UserControl Vista { get; set; }
+        DetallesView detallesview;
 
 
         // CONSTRUCTOR
         public ProductosViewModel()
         {
+            GuardarCommand = new RelayCommand(Guardar);
+            CancelarCommand = new RelayCommand(Cancelar);
+            EditarCommand = new RelayCommand(Editar);
+            AgregarCommand = new RelayCommand(Agregar);
+            EliminarCommand = new RelayCommand(Eliminar);
             RellenarListaProductos();
             ListaSeccion = new(context.Seccions.OrderBy(x => x.Nombre));
 
@@ -80,26 +90,100 @@ namespace FerreteraBD.ViewModels
 
         // METODOS
 
+        private void Iniciar()
+        {
+            detallesview = new DetallesView() { DataContext = this };
+
+            Vista = detallesview;
+            Actualizar();
+        }
+
         //CRUD
 
         public void Agregar()
         {
-
+            Error = "";
+            Producto = new Producto();
+            Modo = "Agregar";
+            Vista = detallesview;
+            Actualizar();
         }
         public void Editar()
         {
-
+            Error = "";
+            Modo = "Editar";
+            Vista = detallesview;
+            Actualizar();
         }
         public void Guardar()
         {
+            if (Producto != null)
+            {
+                Error = "";
+                if (string.IsNullOrWhiteSpace(Producto.Nombre))
+                {
+                    Error += "Escriba el nombre del empleado" + Environment.NewLine;
+                }
+                if (Producto.Precio <= 0)
+                {
+                    Error += "El sueldo del empleado debe ser mayor a $0.00" + Environment.NewLine;
+                }
+                Actualizar("Error");
 
-        }
-        public void Cancelar()
+                if (Error == "")
+                {
+                    if (producto.Id == 0)
+                    {
+                        context.Productos.Add(Producto);
+                    }
+                    else
+                    {
+                        context.Update(Producto);
+                    }
+                    context.SaveChanges();
+                    context.Entry(Producto).Reload();
+                    Actualizar("");
+                    RellenarListaProductos();
+                    Cancelar();
+                }
+            }
+
+            }
+            public void Cancelar()
         {
+            try
+            {
+                if (Producto != null)
+                {
+                    context.Entry(Producto).Reload();
+                }
+                Error = "";
+                Vista = detallesview;
+                Actualizar("Vista");
+            }
+            catch (Exception ex)
+            {
+                Error = ex.ToString();
+            }
 
         }
 
-
+        private void Eliminar()
+        {
+            try
+            {
+                Error = "";
+                context.Productos.Remove(context.Productos.FirstOrDefault(x => x.Id == producto.Id));
+                context.SaveChanges();
+                Actualizar("ListaProductos");
+                RellenarListaProductos();
+            }
+            catch (Exception)
+            {
+                Error = "Selecciona un elemento para poder eliminarlo";
+            }
+            
+        }
 
         //Metodo para rellenar la lista de productos, tambien nos servira para actualizarla
         public void RellenarListaProductos()

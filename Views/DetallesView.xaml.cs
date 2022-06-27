@@ -13,14 +13,14 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace FerreteraBD
+namespace FerreteraBD.Views
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    /// Lógica de interacción para DetallesView.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class DetallesView : UserControl
     {
-        public MainWindow()
+        public DetallesView()
         {
             InitializeComponent();
         }
